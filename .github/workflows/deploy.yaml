@@ -27,8 +27,10 @@ jobs:
 
       # 3. Stop old container and run new one (Directly on your PC)
       - name: Deploy
-        shell: cmd
         run: |
-          docker stop rag-frontend || true
-          docker rm rag-frontend || true
+          # PowerShell way to ignore errors if container doesn't exist
+          try { docker stop rag-frontend } catch {}
+          try { docker rm rag-frontend } catch {}
+          
+          # Run the new container
           docker run -d --name rag-frontend -p 80:80 rag-frontend:latest
