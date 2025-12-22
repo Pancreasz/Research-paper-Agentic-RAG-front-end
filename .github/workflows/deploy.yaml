@@ -27,14 +27,11 @@ jobs:
 
       # 3. Stop old container and run new one (Directly on your PC)
       - name: Deploy
-        shell: cmd
+        shell: powershell  # <--- CRITICAL FIX: Forces Windows to use PowerShell
         run: |
+          # Safely stop and remove old container
           try { docker stop rag-frontend } catch {}
           try { docker rm rag-frontend } catch {}
           
-          # FIX: Add '--add-host=host.docker.internal:host-gateway'
-          docker run -d ^
-            --name rag-frontend ^
-            -p 80:80 ^
-            --add-host=host.docker.internal:host-gateway ^
-            rag-frontend:latest
+          # Run new container with "Host Access" enabled
+          docker run -d --name rag-frontend -p 80:80 --add-host=host.docker.internal:host-gateway rag-frontend:latest
