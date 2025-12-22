@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { X, UploadCloud, FileText } from 'lucide-react';
+import { X, Upload, FileText } from 'lucide-react'; 
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -8,11 +8,10 @@ interface UploadModalProps {
 }
 
 export default function UploadModal({ isOpen, onClose, topic }: UploadModalProps) {
+  // 1. ALWAYS call hooks at the top level
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-
-  if (!isOpen) return null;
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -29,14 +28,12 @@ export default function UploadModal({ isOpen, onClose, topic }: UploadModalProps
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      // Convert FileList to Array
       setFiles(Array.from(e.dataTransfer.files));
     }
   }, []);
 
   const uploadFiles = async () => {
     setUploading(true);
-    // Loop through files and upload one by one
     for (const file of files) {
       const formData = new FormData();
       formData.append('data', file);
@@ -54,27 +51,37 @@ export default function UploadModal({ isOpen, onClose, topic }: UploadModalProps
     onClose();
   };
 
+  // 2. NOW you can conditionally render.
+  // The hooks above have already run, so React is happy.
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative m-4">
+        
+        <button 
+            onClick={onClose} 
+            className="absolute top-4 right-4 text-gray-500 hover:text-black transition-colors"
+        >
           <X size={20} />
         </button>
 
-        <h2 className="text-xl font-bold mb-4">Upload to "{topic}"</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-800">Upload to "{topic}"</h2>
 
-        {/* Drag Drop Zone */}
         <div 
-          className={`border-2 border-dashed rounded-xl h-48 flex flex-col items-center justify-center transition-colors ${
-            dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-gray-50"
+          className={`border-2 border-dashed rounded-xl h-48 flex flex-col items-center justify-center transition-all ${
+            dragActive 
+              ? "border-blue-500 bg-blue-50 scale-105" 
+              : "border-gray-300 bg-gray-50"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
         >
-          <UploadCloud size={48} className="text-gray-400 mb-2" />
-          <p className="text-sm text-gray-500">Drag & Drop files here or click to select</p>
+          <Upload size={40} className={`mb-2 ${dragActive ? "text-blue-500" : "text-gray-400"}`} />
+          <p className="text-sm text-gray-500 font-medium">Drag & Drop files here</p>
+          
           <input 
             type="file" 
             multiple 
@@ -82,16 +89,18 @@ export default function UploadModal({ isOpen, onClose, topic }: UploadModalProps
             id="fileInput"
             onChange={(e) => e.target.files && setFiles(Array.from(e.target.files))}
           />
-          <label htmlFor="fileInput" className="mt-2 text-blue-600 cursor-pointer font-medium hover:underline">
+          <label 
+            htmlFor="fileInput" 
+            className="mt-2 text-blue-600 cursor-pointer text-sm font-semibold hover:underline"
+          >
             Browse Files
           </label>
         </div>
 
-        {/* File List Preview */}
         {files.length > 0 && (
-          <div className="mt-4 max-h-32 overflow-y-auto space-y-2">
+          <div className="mt-4 max-h-32 overflow-y-auto space-y-2 border-t pt-2">
             {files.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm bg-gray-100 p-2 rounded">
+              <div key={i} className="flex items-center gap-2 text-sm bg-gray-100 p-2 rounded text-gray-700">
                 <FileText size={14} />
                 <span className="truncate">{f.name}</span>
               </div>
@@ -102,7 +111,7 @@ export default function UploadModal({ isOpen, onClose, topic }: UploadModalProps
         <button 
           onClick={uploadFiles}
           disabled={uploading || files.length === 0}
-          className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg font-semibold disabled:bg-gray-400 hover:bg-blue-700 transition"
+          className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg font-semibold disabled:bg-gray-300 hover:bg-blue-700 transition shadow-lg active:scale-95"
         >
           {uploading ? "Uploading..." : `Upload ${files.length} Files`}
         </button>
