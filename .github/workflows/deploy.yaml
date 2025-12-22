@@ -22,10 +22,12 @@ jobs:
 
       # 2. Build the image directly on your PC
       - name: Build Docker Image
+        shell: cmd
         run: docker build -t rag-frontend:latest .
 
       # 3. Stop old container and run new one (Directly on your PC)
       - name: Deploy
+        shell: cmd
         run: |
           docker stop rag-frontend || true
           docker rm rag-frontend || true
