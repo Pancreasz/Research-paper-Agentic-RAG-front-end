@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/n8n/:path*",
+      "destination": "https://n8n-web-fcfwcaapbwabedc2.japanwest-01.azurewebsites.net/webhook/:path*"
+    }
+  ]
+}
