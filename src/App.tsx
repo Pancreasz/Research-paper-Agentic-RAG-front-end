@@ -14,13 +14,15 @@ export default function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 2. Load Topics from Server on Startup
   useEffect(() => {
     fetch('/api/n8n/get-topics')
       .then(res => res.json())
       .then(data => {
-        // Validation: Ensure we actually got an array
-        const list = Array.isArray(data) ? data : ["ear-biometrics", "yolo-models", "startup-strategy"];
+        // FIX: Check if data.result exists, otherwise check if data itself is the array
+        // This handles both { result: [...] } and raw [...] formats
+        const rawList = data.result || data;
+        
+        const list = Array.isArray(rawList) ? rawList : ["ear-biometrics", "yolo-models", "startup-strategy"];
         setTopics(list);
         
         // Select the first topic automatically
