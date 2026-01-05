@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import UploadModal from './components/UploadModal';
 
 export default function App() {
-  const [topics, setTopics] = useState(["ear-biometrics", "yolo-models", "startup-strategy"]);
-  const [currentTopic, setCurrentTopic] = useState("ear-biometrics");
+  // 1. Initialize State (Empty start, waiting for server)
+  const [topics, setTopics] = useState<string[]>([]);
+  const [currentTopic, setCurrentTopic] = useState<string>("");
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   
   // Chat State
@@ -13,11 +14,70 @@ export default function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // 2. Load Topics from Server on Startup
+  useEffect(() => {
+    fetch('/api/n8n/get-topics')
+      .then(res => res.json())
+      .then(data => {
+        // Validation: Ensure we actually got an array
+        const list = Array.isArray(data) ? data : ["ear-biometrics", "yolo-models", "startup-strategy"];
+        setTopics(list);
+        
+        // Select the first topic automatically
+        if (list.length > 0) {
+          setCurrentTopic(list[0]);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load topics:", err);
+        // Fallback if server fails
+        setTopics(["ear-biometrics"]); 
+        setCurrentTopic("ear-biometrics");
+      });
+  }, []);
+
+  // Helper: Save changes to n8n
+  const saveTopicsToServer = async (updatedList: string[]) => {
+    try {
+      await fetch('/api/n8n/save-topics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topics: updatedList })
+      });
+    } catch (err) {
+      console.error("Error saving topics:", err);
+      alert("Warning: Changes couldn't be saved to the server.");
+    }
+  };
+
+  // 3. Add Topic Handler (Updates UI + Server)
   const handleAddTopic = () => {
     const newTopic = prompt("Enter new topic name:");
     if (newTopic && !topics.includes(newTopic)) {
-      setTopics([...topics, newTopic]);
-      setCurrentTopic(newTopic);
+      const updatedTopics = [...topics, newTopic];
+      setTopics(updatedTopics); // Immediate UI update
+      setCurrentTopic(newTopic); // Switch to new topic
+      
+      saveTopicsToServer(updatedTopics); // Background save
+    }
+  };
+
+  // 4. Delete Topic Handler (Updates UI + Server)
+  const handleDeleteTopic = (topicToDelete: string) => {
+    if (confirm(`Delete topic "${topicToDelete}"?`)) {
+      const updatedTopics = topics.filter(t => t !== topicToDelete);
+      setTopics(updatedTopics);
+
+      // If we deleted the active topic, switch to the first available one
+      if (currentTopic === topicToDelete) {
+        if (updatedTopics.length > 0) {
+          setCurrentTopic(updatedTopics[0]);
+        } else {
+          setCurrentTopic(""); // No topics left
+        }
+      }
+      
+      saveTopicsToServer(updatedTopics);
     }
   };
 
@@ -57,6 +117,7 @@ export default function App() {
         currentTopic={currentTopic}
         onSelectTopic={setCurrentTopic}
         onAddTopic={handleAddTopic}
+        onDeleteTopic={handleDeleteTopic}
         onOpenUpload={() => setIsUploadOpen(true)}
       />
       

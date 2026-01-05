@@ -1,4 +1,4 @@
-import { Plus, Folder, Upload } from 'lucide-react'; // Install lucide-react or use text
+import { Plus, Folder, Upload, Trash2 } from 'lucide-react';
 
 interface SidebarProps {
   topics: string[];
@@ -6,9 +6,17 @@ interface SidebarProps {
   onSelectTopic: (t: string) => void;
   onAddTopic: () => void;
   onOpenUpload: () => void;
+  onDeleteTopic: (t: string) => void;
 }
 
-export default function Sidebar({ topics, currentTopic, onSelectTopic, onAddTopic, onOpenUpload }: SidebarProps) {
+export default function Sidebar({ 
+  topics, 
+  currentTopic, 
+  onSelectTopic, 
+  onAddTopic, 
+  onOpenUpload, 
+  onDeleteTopic 
+}: SidebarProps) {
   return (
     <div className="w-64 bg-gray-900 text-white flex flex-col h-screen border-r border-gray-700">
       <div className="p-4 font-bold text-xl border-b border-gray-700 flex items-center gap-2">
@@ -18,16 +26,29 @@ export default function Sidebar({ topics, currentTopic, onSelectTopic, onAddTopi
       {/* Topic List */}
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
         {topics.map((topic) => (
-          <button
-            key={topic}
-            onClick={() => onSelectTopic(topic)}
-            className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${
-              currentTopic === topic ? "bg-blue-600" : "hover:bg-gray-800"
-            }`}
-          >
-            <Folder size={18} />
-            <span className="truncate">{topic}</span>
-          </button>
+          <div key={topic} className="relative group"> {/* 'group' allows child to react to parent hover */}
+            <button
+              onClick={() => onSelectTopic(topic)}
+              className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${
+                currentTopic === topic ? "bg-blue-600" : "hover:bg-gray-800"
+              }`}
+            >
+              <Folder size={18} />
+              <span className="truncate pr-8">{topic}</span>
+            </button>
+
+            {/* Delete Icon - Hidden by default (opacity-0), visible on hover (group-hover:opacity-100) */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevents clicking the topic itself
+                onDeleteTopic(topic);
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Delete Topic"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         ))}
       </div>
 
