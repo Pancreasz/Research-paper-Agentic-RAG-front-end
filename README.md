@@ -55,3 +55,21 @@ flowchart TD
         Upload["Upload Document"] -->|Chunk & Embed| Gemini
         Gemini -->|Store Vectors| PG
     end
+```
+---
+
+## 📸 Screenshots
+
+### n8n Workflow
+
+<img width="899" height="595" alt="image" src="https://github.com/user-attachments/assets/d676e43a-b8e7-4227-b23b-8e5ff22fde74" />
+
+### RAG Workflow
+
+<img width="926" height="603" alt="image" src="https://github.com/user-attachments/assets/79efb875-8018-4916-840f-32259f1dfd37" />
+
+### Upload Pipeline
+
+<img width="868" height="584" alt="image" src="https://github.com/user-attachments/assets/0beaf51f-06ef-404a-ac8b-56ff149c3e59" />
+
+
