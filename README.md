@@ -1,76 +1,75 @@
-# React + TypeScript + Vite
+# 🤖 Agentic RAG: Autonomous Knowledge Base System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Project Status](https://img.shields.io/badge/Status-Active-success)
+![Deployment](https://img.shields.io/badge/Deployed%20on-Azure%20%26%20Vercel-blue)
+![AI Model](https://img.shields.io/badge/AI-Google%20Gemini%201.5-orange)
 
-Currently, two official plugins are available:
+An intelligent, self-hosted **Retrieval-Augmented Generation (RAG)** system designed to query internal documentation with high precision. This project orchestrates autonomous AI agents using **n8n** to dynamically route user queries, retrieve context via **PostgreSQL (pgvector)**, and synthesize answers using **Google Gemini**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Autonomous Agent Routing:** Uses an n8n AI Agent to intelligently decide when to search the knowledge base versus answering general questions.
+* **Semantic Search Engine:** Implemented high-performance vector retrieval using **PostgreSQL (pgvector)** and **Gemini Embeddings** to find relevant context in uploaded documents.
+* **Self-Hosted Architecture:** Fully containerized backend running on **Microsoft Azure Web Apps** via Docker Compose.
+* **Persistent Workflow Storage:** Optimized configuration using **SQLite** for n8n workflow persistence and **Postgres** for ephemeral vector data.
+* **Secure Cross-Cloud Proxy:** Custom **Vercel** middleware (`vercel.json`) to handle CORS-free communication between the React frontend and Azure backend.
+* **Document Ingestion Pipeline:** Automated workflow to upload, chunk, and embed PDF/Text documents with metadata tagging.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### **Backend & Infrastructure**
+* **Orchestration:** [n8n](https://n8n.io/) (Workflow Automation)
+* **Vector Database:** PostgreSQL with `pgvector` extension
+* **Cloud Provider:** Microsoft Azure (App Service / Web App for Containers)
+* **Containerization:** Docker & Docker Compose
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### **AI & LLM**
+* **Inference Model:** Google Gemini 1.5 Pro / Flash
+* **Embeddings:** Google Gemini Text Embeddings
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### **Frontend**
+* **Framework:** React (Vite) + TypeScript
+* **Styling:** Tailwind CSS (or custom CSS)
+* **Deployment:** Vercel
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    User["User via React App"] -->|HTTPS Request| Vercel["Vercel Proxy"]
+    Vercel -->|Secure Forward| Azure["Azure Web App (n8n)"]
+    
+    subgraph "Azure Container Group"
+        Azure -->|Router| Agent["AI Agent"]
+        Agent -->|General Query| Gemini["Google Gemini API"]
+        Agent -->|Knowledge Search| PG["PostgreSQL (pgvector)"]
+    end
+    
+    subgraph "Data Pipeline"
+        Upload["Upload Document"] -->|Chunk & Embed| Gemini
+        Gemini -->|Store Vectors| PG
+    end
 ```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📸 Screenshots
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### n8n Workflow
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+<img width="899" height="595" alt="image" src="https://github.com/user-attachments/assets/d676e43a-b8e7-4227-b23b-8e5ff22fde74" />
 
-test gh action
+### RAG Workflow
 
-```
+<img width="926" height="603" alt="image" src="https://github.com/user-attachments/assets/79efb875-8018-4916-840f-32259f1dfd37" />
+
+### Upload Pipeline
+
+<img width="868" height="584" alt="image" src="https://github.com/user-attachments/assets/0beaf51f-06ef-404a-ac8b-56ff149c3e59" />
+
+
