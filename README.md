@@ -41,17 +41,17 @@ An intelligent, self-hosted **Retrieval-Augmented Generation (RAG)** system desi
 ## 🏗️ Architecture
 
 ```mermaid
-graph TD
-    User[User via React App] -->|HTTPS Request| Vercel[Vercel Proxy]
-    Vercel -->|Secure Forward| Azure[Azure Web App (n8n)]
+flowchart TD
+    User["User via React App"] -->|HTTPS Request| Vercel["Vercel Proxy"]
+    Vercel -->|Secure Forward| Azure["Azure Web App (n8n)"]
     
     subgraph "Azure Container Group"
-        Azure -->|Router| Agent[AI Agent]
-        Agent -->|General Query| Gemini[Google Gemini API]
-        Agent -->|Knowledge Search| PG[PostgreSQL (pgvector)]
+        Azure -->|Router| Agent["AI Agent"]
+        Agent -->|General Query| Gemini["Google Gemini API"]
+        Agent -->|Knowledge Search| PG["PostgreSQL (pgvector)"]
     end
     
     subgraph "Data Pipeline"
-        Upload[Upload Document] -->|Chunk & Embed| Gemini
+        Upload["Upload Document"] -->|Chunk & Embed| Gemini
         Gemini -->|Store Vectors| PG
     end
